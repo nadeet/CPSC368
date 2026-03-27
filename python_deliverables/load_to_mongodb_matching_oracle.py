@@ -15,7 +15,7 @@ Install dependencies:
     pip install pandas pymongo
 
 Run:
-    python python_deliverables/load_to_mongodb.py
+    python python_deliverables/load_to_mongodb_matching_oracle.py
 """
 
 from pathlib import Path
@@ -177,19 +177,66 @@ def compute_genre_summary(letterboxd_genres):
 
 # 3. LOAD CSV FILES
 
+# def load_data():
+#     """
+#     Read all cleaned CSV files into pandas DataFrames.
+#     """
+#     lb_movies = pd.read_csv(LETTERBOXD_MOVIES_FILE)
+#     lb_genres = pd.read_csv(LETTERBOXD_GENRES_FILE)
+#     imdb_movies = pd.read_csv(IMDB_FILE)
+#     rt_movies = pd.read_csv(ROTTEN_TOMATOES_FILE)
+#     studios = pd.read_csv(STUDIOS_FILE)
+
+#     # Standardize column names to lowercase.
+#     for df in [lb_movies, lb_genres, imdb_movies, rt_movies, studios]:
+#         df.columns = [col.strip().lower() for col in df.columns]
+
+#     return lb_movies, lb_genres, imdb_movies, rt_movies, studios
+
 def load_data():
-    """
-    Read all cleaned CSV files into pandas DataFrames.
-    """
     lb_movies = pd.read_csv(LETTERBOXD_MOVIES_FILE)
     lb_genres = pd.read_csv(LETTERBOXD_GENRES_FILE)
     imdb_movies = pd.read_csv(IMDB_FILE)
     rt_movies = pd.read_csv(ROTTEN_TOMATOES_FILE)
     studios = pd.read_csv(STUDIOS_FILE)
 
-    # Standardize column names to lowercase.
+    # Standardize column names
     for df in [lb_movies, lb_genres, imdb_movies, rt_movies, studios]:
         df.columns = [col.strip().lower() for col in df.columns]
+
+    # drop NA
+    lb_movies = lb_movies.dropna()
+    lb_genres = lb_genres.dropna()
+    imdb_movies = imdb_movies.dropna()
+    rt_movies = rt_movies.dropna()
+    studios = studios.dropna()
+
+    # remove duplicates
+    lb_movies = lb_movies.drop_duplicates(subset=["id"])
+    lb_genres = lb_genres.drop_duplicates(subset=["id", "genre"])
+    studios = studios.drop_duplicates(subset=["id", "studio"])
+    imdb_movies = imdb_movies.drop_duplicates(subset=["name", "year"])
+    rt_movies = rt_movies.drop_duplicates(subset=["movie_title", "year"])
+
+    lb_movies = lb_movies[
+        (lb_movies["date"] >= 1998) &
+        (lb_movies["date"] <= 2013)
+    ]
+
+    imdb_movies = imdb_movies[
+        (imdb_movies["year"] >= 1998) &
+        (imdb_movies["year"] <= 2013)
+    ]
+
+    rt_movies = rt_movies[
+        (rt_movies["year"] >= 1998) &
+        (rt_movies["year"] <= 2013)
+    ]
+    
+    valid_ids = set(lb_movies["id"])
+
+    lb_genres = lb_genres[lb_genres["id"].isin(valid_ids)]
+    studios = studios[studios["id"].isin(valid_ids)]
 
     return lb_movies, lb_genres, imdb_movies, rt_movies, studios
 
