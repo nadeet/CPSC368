@@ -1,5 +1,5 @@
 """
-load_to_mongodb.py
+load_to_mongodb_matching_oracle.py
 
 Loads the cleaned Phase 4 CSV files into MongoDB using a film-centered
 document structure.
@@ -176,22 +176,6 @@ def compute_genre_summary(letterboxd_genres):
     }
 
 # 3. LOAD CSV FILES
-
-# def load_data():
-#     """
-#     Read all cleaned CSV files into pandas DataFrames.
-#     """
-#     lb_movies = pd.read_csv(LETTERBOXD_MOVIES_FILE)
-#     lb_genres = pd.read_csv(LETTERBOXD_GENRES_FILE)
-#     imdb_movies = pd.read_csv(IMDB_FILE)
-#     rt_movies = pd.read_csv(ROTTEN_TOMATOES_FILE)
-#     studios = pd.read_csv(STUDIOS_FILE)
-
-#     # Standardize column names to lowercase.
-#     for df in [lb_movies, lb_genres, imdb_movies, rt_movies, studios]:
-#         df.columns = [col.strip().lower() for col in df.columns]
-
-#     return lb_movies, lb_genres, imdb_movies, rt_movies, studios
 
 def load_data():
     lb_movies = pd.read_csv(LETTERBOXD_MOVIES_FILE)
